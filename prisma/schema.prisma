@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:C:\\Users\\colli\\Documents\\Nusameta\\Sprint 1\\api-peternakan\\prisma\\peternakan.db"
+}
+
+model gps {
+  id_gps                   Int       @id @default(autoincrement())
+  latitude                 Float
+  longitude                Float
+  kandang_kandang_gpsTogps kandang[] @relation("kandang_gpsTogps")
+}
+
+model kandang {
+  id_kandang                 Int    @id @default(autoincrement())
+  gps                        Int
+  kelembapan                 Float
+  kadar_co2                  Float
+  gps_kandang_gpsTogps       gps    @relation("kandang_gpsTogps", fields: [gps], references: [id_gps], onDelete: NoAction, onUpdate: NoAction)
+  sapi_sapi_kandangTokandang sapi[] @relation("sapi_kandangTokandang")
+}
+
+model nutrisi {
+  id_nutrisi              Int    @id @default(autoincrement())
+  sapi                    Int
+  kondisi                 String
+  sapi_nutrisi_sapiTosapi sapi   @relation("nutrisi_sapiTosapi", fields: [sapi], references: [id_sapi], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model sapi {
+  id_sapi                       Int       @id @default(autoincrement())
+  kandang                       Int
+  nama                          String
+  jenis_kelamin                 String
+  suhu                          Float
+  detak_jantung                 Int
+  nutrisi_nutrisi_sapiTosapi    nutrisi[] @relation("nutrisi_sapiTosapi")
+  kandang_sapi_kandangTokandang kandang   @relation("sapi_kandangTokandang", fields: [kandang], references: [id_kandang], onDelete: NoAction, onUpdate: NoAction)
+}
