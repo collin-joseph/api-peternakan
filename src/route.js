@@ -38,38 +38,28 @@ app.post('/new/nutrisi', async (req, res) => {
             kondisi,
         },
     })
-    const nutrisiConnect = await prisma.nutrisi.update({
-        where: {
-            id_nutrisi,
-        },
-        data: {
-            sapi: {
-                connect: {
-                    id_sapi,
-                }
-            }
-        }
-    })
     res.json(nutrisiNew);
-    res.json(nutrisiConnect);
 })
 
 app.post('/new/sapi', async (req, res) => {
-    const { latitude, longitude } = req.body
-    const gps = await prisma.gps.create({
+    const { id_kandang, nama, jenis_kelamin, suhu, detak_jantung,  } = req.body
+    const newSapi = await prisma.sapi.create({
         data: {
-            latitude,
-            longitude,
+            id_kandang,
+            nama,
+            jenis_kelamin,
+            suhu,
+            detak_jantung,
         },
     })
-    res.json(gps);
+    res.json(newSapi);
 })
 
 app.post('/new/kandang', async (req, res) => {
-    const { id_gps, kelembapan, kadar_co2 } = req.body
+    const { gps, kelembapan, kadar_co2 } = req.body
     const newKandang = await prisma.kandang.create({
         data: {
-            id_gps,
+            gps: { connect: { id_gps: gps } },
             kelembapan,
             kadar_co2,
         },
@@ -86,6 +76,62 @@ app.post('/new/gps', async (req, res) => {
         },
     })
     res.json(newGps);
+})
+
+app.put('/update/nutrisi/:id', async (req, res) => {
+    const { id } = req.params;
+    const { sapi, kondisi } = req.body;
+    const updateNutrisi = await prisma.nutrisi.update({
+        where: { id_nutrisi: Number(id)},
+        data: {
+            sapi: { connect: { id_sapi: sapi } },
+            kondisi,
+        }
+    })
+    res.json(updateNutrisi)
+})
+
+app.put('/update/sapi/:id', async (req, res) => {
+    const { id } = req.params;
+    const { kandang, nama, jenis_kelamin, suhu, detak_jantung } = req.body
+    const updateSapi = await prisma.sapi.update({
+        where: { id_sapi: Number(id) },
+        data: {
+        kandang: { connect: { id_kandang: kandang } },
+        nama,
+        jenis_kelamin,
+        suhu,
+        detak_jantung
+        }
+    })
+    res.json(updateSapi)
+})
+
+app.put('/update/kandang/:id', async (req, res) => {
+    const { id } = req.params;
+    const { gps, kelembapan, kadar_co2 } = req.body
+    const updateKandang = await prisma.kandang.update({
+        where: { id_kandang: Number(id) },
+        data: {
+        gps: { connect: { id_gps: gps } },
+        kelembapan,
+        kadar_co2,
+        }
+    })
+    res.json(updateKandang)
+})
+
+app.put('/update/gps/:id', async (req, res) => {
+    const { id } = req.params;
+    const { latitude, longitude } = req.body
+    const updateGps = await prisma.gps.update({
+        where: { id_gps: Number(id) },
+        data: {
+        latitude,
+        longitude,
+      }
+    })
+    res.json(updateGps)
 })
 
 app.delete('/nutrisi/:id', async (req, res) => {
@@ -108,8 +154,27 @@ app.delete('/sapi/:id', async (req, res) => {
     res.json(deleteSapi)
 })
 
+app.delete('/kandang/:id', async (req, res) => {
+    const { id } = req.params;
+    const deleteKandang = await prisma.kandang.delete({
+        where: {
+            id_kandang: Number(id),
+        },
+    })
+    res.json(deleteKandang)
+})
+
+app.delete('/gps/:id', async (req, res) => {
+    const { id } = req.params;
+    const deleteGps = await prisma.gps.delete({
+        where: {
+            id_gps: Number(id),
+        },
+    })
+    res.json(deleteGps)
+})
+
 const server = app.listen(3000, () =>
     console.log(`
-🚀 Server ready at: http://localhost:3000
-⭐️ See sample requests: http://pris.ly/e/js/rest-express#3-using-the-rest-api`),
+🚀 Server ready at: http://localhost:3000`),
 )
