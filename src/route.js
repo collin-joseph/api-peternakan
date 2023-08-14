@@ -69,6 +69,8 @@ app.post('/new/kandang', async (req, res) => {
 
 app.post('/new/gps', async (req, res) => {
     const { latitude, longitude } = req.body
+    console.log('Received latitude:', latitude);
+    console.log('Received longitude:', longitude);
     const newGps = await prisma.gps.create({
         data: {
             latitude,
@@ -79,8 +81,8 @@ app.post('/new/gps', async (req, res) => {
 })
 
 app.put('/update/nutrisi/:id', async (req, res) => {
-    const { id } = req.params;
-    const { sapi, kondisi } = req.body;
+    const { id } = req.params
+    const { sapi, kondisi } = req.body
     const updateNutrisi = await prisma.nutrisi.update({
         where: { id_nutrisi: Number(id)},
         data: {
@@ -92,7 +94,7 @@ app.put('/update/nutrisi/:id', async (req, res) => {
 })
 
 app.put('/update/sapi/:id', async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params
     const { kandang, nama, jenis_kelamin, suhu, detak_jantung } = req.body
     const updateSapi = await prisma.sapi.update({
         where: { id_sapi: Number(id) },
@@ -108,7 +110,7 @@ app.put('/update/sapi/:id', async (req, res) => {
 })
 
 app.put('/update/kandang/:id', async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params
     const { gps, kelembapan, kadar_co2 } = req.body
     const updateKandang = await prisma.kandang.update({
         where: { id_kandang: Number(id) },
@@ -122,7 +124,7 @@ app.put('/update/kandang/:id', async (req, res) => {
 })
 
 app.put('/update/gps/:id', async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params
     const { latitude, longitude } = req.body
     const updateGps = await prisma.gps.update({
         where: { id_gps: Number(id) },
@@ -134,7 +136,7 @@ app.put('/update/gps/:id', async (req, res) => {
     res.json(updateGps)
 })
 
-app.delete('/nutrisi/:id', async (req, res) => {
+app.delete('delete/nutrisi/:id', async (req, res) => {
     const { id } = req.params;
     const deleteNutrisi = await prisma.nutrisi.delete({
         where: {
@@ -144,7 +146,7 @@ app.delete('/nutrisi/:id', async (req, res) => {
     res.json(deleteNutrisi)
 })
 
-app.delete('/sapi/:id', async (req, res) => {
+app.delete('delete/sapi/:id', async (req, res) => {
     const { id } = req.params;
     const deleteSapi = await prisma.sapi.delete({
         where: {
@@ -154,7 +156,7 @@ app.delete('/sapi/:id', async (req, res) => {
     res.json(deleteSapi)
 })
 
-app.delete('/kandang/:id', async (req, res) => {
+app.delete('delete/kandang/:id', async (req, res) => {
     const { id } = req.params;
     const deleteKandang = await prisma.kandang.delete({
         where: {
@@ -164,7 +166,7 @@ app.delete('/kandang/:id', async (req, res) => {
     res.json(deleteKandang)
 })
 
-app.delete('/gps/:id', async (req, res) => {
+app.delete('delete/gps/:id', async (req, res) => {
     const { id } = req.params;
     const deleteGps = await prisma.gps.delete({
         where: {

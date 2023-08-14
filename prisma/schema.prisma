@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:C:\\Users\\colli\\Documents\\Nusameta\\Sprint 1\\api-peternakan\\prisma\\peternakan.db"
+  url      = "file:C:\\Users\\colli\\Documents\\Nusameta\\Sprint 1\\api-peternakan\\src\\peternakan.db"
 }
 
 model gps {
