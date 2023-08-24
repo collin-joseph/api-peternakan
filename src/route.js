@@ -1,58 +1,436 @@
 // Prerequisites
 const express = require('express')
+const app = express()
+const sqlite = require('sqlite3').verbose()
+const db = new sqlite.Database('C:\\Users\\colli\\Documents\\Nusameta\\Sprint 2\\api-peternakan\\src\\peternakan.db')
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
-const app = express()
+const swaggerUI = require('swagger-ui-express')
+const swaggerJsDoc = require('swagger-jsdoc')
+
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API Peternakan',
+            version: '2.0.0',
+            description: 'API yang melacak data-data nutrisi sapi dari sebuah peternakan'
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000'
+            }
+        ],
+    },
+    apis: ['C:\\Users\\colli\\Documents\\Nusameta\\Sprint 2\\api-peternakan\\src\\route.js']
+}
+
+const specs = swaggerJsDoc(options)
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs))
 
 app.use(express.json())
 
-// Update data sapi
-app.get('/nutrisi', async (req, res) => {
-    const nutrisi = await prisma.nutrisi.findMany({})
-    res.json(nutrisi)
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      kandang:
+ *          type: object
+ *          required:
+ *              - id_kandang
+ *              - lokasi
+ *              - lintang
+ *              - bujur
+ *              - kelembapan
+ *              - co2
+ *              - metana
+ *              - kebisingan
+ *          properties:
+ *              id_kandang:
+ *                  type: integer
+ *                  description: ID yang tergenerasi secara otomatis untuk setiap kandang
+ *              lokasi:
+ *                  type: string
+ *                  description: Lokasi perkiraan
+ *              lintang:
+ *                  type: float
+ *                  description: Koordinat garis lintang
+ *              bujur:
+ *                  type: float
+ *                  description: Koordinat garis bujur
+ *              kelembapan:
+ *                  type: float
+ *                  description: Kadar kelembapan dalam kandang
+ *              co2:
+ *                  type: float
+ *                  description: Kadar gas karbondioksida dalam kandang
+ *              metana:
+ *                  type: float
+ *                  description: Kadar gas metana dalam kandang
+ *              kebisingan:
+ *                  type: float
+ *                  description: Nilai kebisingan dalam kandang
+ *          example:
+ *              id_kandang: 1
+ *              lokasi: Kebon Jeruk
+ *              lintang: 90
+ *              bujur: 90
+ *              kelembapan: 80
+ *              co2: 40
+ *              metana: 10
+ *              kebisingan: 30
+ *      sapi:
+ *          type: object
+ *          required:
+ *              - id_sapi
+ *              - kandang
+ *              - nama
+ *              - jenis_kelamin
+ *              - suhu
+ *              - detak_jantung
+ *              - kesehatan
+ *          properties:
+ *              id_sapi:
+ *                  type: integer
+ *                  description: ID yang tergenerasi secara otomatis untuk setiap sapi
+ *              kandang:
+ *                  type: integer
+ *                  description: ID kandang dari tabel kandang
+ *              nama:
+ *                  type: string
+ *                  description: Nama sapi
+ *              jenis_kelamin:
+ *                  type: string
+ *                  description: Jenis kelamin dari sapi
+ *              suhu:
+ *                  type: float
+ *                  description: Suhu tubuh sapi
+ *              detak_jantung:
+ *                  type: float
+ *                  description: Detak jantung rata-rata sapi
+ *              kesehatan:
+ *                  type: string
+ *                  description: Kondisi kesehatan sapi
+ *          example:
+ *              id_sapi: 1
+ *              kandang: 1
+ *              nama: Collin
+ *              jenis_kelamin: Laki-laki
+ *              suhu: 38
+ *              detak_jantung: 78
+ *              kesehatan: Sehat
+ */
+
+/**
+ * @swagger
+ * tags:
+ *  - name: Kandang
+ *    description: Route untuk tabel kandang
+ *  - name: Sapi
+ *    description: Route untuk tabel sapi
+ */
+
+/**
+ * @swagger
+ * /kandang:
+ *  get:
+ *      summary: Display semua data kandang
+ *      tags: [Kandang]
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: '#/components/schemas/kandang'
+ * /kandang/{id}:
+ *  get:
+ *      summary: Display data sebuah kandang
+ *      tags: [Kandang]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            required: true
+ *            description: ID kandang
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: '#/components/schemas/kandang'
+ * /new/kandang:
+ *  post:
+ *      summary: Buat kandang baru
+ *      tags: [Kandang]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#components/schemas/kandang'
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/kandang'
+ * /update/kandang/{id}:
+ *  put:
+ *      summary: Memperbarui data kandang
+ *      tags: [Kandang]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            required: true
+ *            description: ID kandang
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#components/schemas/kandang'
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/kandang'
+ * /delete/kandang/{id}:
+ *  delete:
+ *      summary: Hapus kandang
+ *      tags: [Kandang]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            required: true
+ *            description: ID kandang
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/kandang'
+ * /sapi:
+ *  get:
+ *      summary: Display semua data sapi
+ *      tags: [Sapi]
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: '#/components/schemas/sapi'
+ * /sapi/{id}:
+ *  get:
+ *      summary: Display data sebuah sapi
+ *      tags: [Sapi]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            required: true
+ *            description: ID sapi
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: '#/components/schemas/sapi'
+ * /new/sapi:
+ *  post:
+ *      summary: Buat sapi baru
+ *      tags: [Sapi]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#components/schemas/sapi'
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/sapi'
+ * /update/sapi/{id}:
+ *  put:
+ *      summary: Memperbarui data sapi
+ *      tags: [Sapi]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            required: true
+ *            description: ID sapi
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#components/schemas/sapi'
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/sapi'
+ * /delete/sapi/{id}:
+ *  delete:
+ *      summary: Hapus sapi
+ *      tags: [Sapi]
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: integer
+ *            required: true
+ *            description: ID sapi
+ *      responses:
+ *          200:
+ *              description: Successful
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/sapi'
+ */
+
+// Basic HTTP authentication
+app.use((req, res, next) => {
+    if(!req.get('Authorization')){
+        res.status(401).set('WWW-Authenticate', 'Basic')
+        next(err)
+    }
+    else{
+        var credentials = Buffer.from(req.get('Authorization').split(' ')[1], 'base64')
+        .toString()
+        .split(':')
+        var username = credentials[0]
+        var password = credentials[1]
+        if(!(username === 'admin' && password === 'peternakan123')){
+            var err = new Error('Not Authenticated!')
+            res.status(401).set('WWW-Authenticate', 'Basic')
+            next(err)
+        }
+        res.status(200)
+        next()
+    }
 })
 
+app.get('/', async (req, res) => {
+    res.send('Protected route with Basic HTTP authentication')
+})
+
+// Get data
 app.get('/sapi', async (req, res) => {
     const sapi = await prisma.sapi.findMany({})
     res.json(sapi)
 })
+
+app.get('/sapi/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+      const query = `
+        SELECT sapi.*, kandang.*
+        FROM sapi
+        INNER JOIN kandang ON sapi.kandang = kandang.id_kandang
+        WHERE sapi.id_sapi = ?;
+      `
+      db.all(query, [id], (err, rows) => {
+        if (err) {
+          console.error(err)
+          return res.status(500).send()
+        }
+        res.json(rows)
+      });
+    } catch (err) {
+      console.error(err)
+      res.status(500).send()
+    }
+  })
+  
 
 app.get('/kandang', async (req, res) => {
     const kandang = await prisma.kandang.findMany({})
     res.json(kandang)
 })
 
-app.get('/gps', async (req, res) => {
-    const gps = await prisma.gps.findMany({})
-    res.json(gps)
-})
-
-app.post('/new/nutrisi', async (req, res) => {
-    const { sapi, kondisi } = req.body
+app.get('/kandang/:id', async (req, res) => {
+    const { id } = req.params
     try {
-        console.log(sapi)
-        console.log(kondisi)
-        const nutrisiNew = await prisma.nutrisi.create({
-            data: {
-                sapi: sapi,
-                kondisi,
-            },
+        const query = `
+            SELECT kandang.*, sapi.*
+            FROM kandang
+            INNER JOIN sapi ON kandang.id_kandang = sapi.kandang
+            WHERE kandang.id_kandang = ?;
+            `
+        db.all(query, [id], (err, rows) => {
+            const kandangUnique = {
+                kandang: null,
+                sapi: [],
+              }
+            if (rows.length > 0) {
+                kandangUnique.kandang = {
+                    id_kandang: rows[0].id_kandang,
+                    lokasi: rows[0].lokasi,
+                    lintang: rows[0].lintang,
+                    bujur: rows[0].bujur,
+                    kelembapan: rows[0].kelembapan,
+                    co2: rows[0].co2,
+                    metana: rows[0].metana,
+                    kebisingan: rows[0].kebisingan,
+                }
+                kandangUnique.sapi = rows.map((row) => ({
+                    id_sapi: row.id_sapi,
+                    nama: row.nama,
+                    jenis_kelamin: row.jenis_kelamin,
+                    suhu: row.suhu,
+                    detak_jantung: row.detak_jantung,
+                    kesehatan: row.kesehatan,
+                }))
+            }
+            res.json(kandangUnique);
         })
-        res.json(nutrisiNew)
     } catch(err) {
         console.error(err)
         res.status(500).send()
     }
 })
 
+// Input data
 app.post('/new/sapi', async (req, res) => {
-    const { kandang, nama, jenis_kelamin, suhu, detak_jantung,  } = req.body
+    const { kandang, nama, jenis_kelamin, suhu, detak_jantung, kesehatan } = req.body
     try {
         console.log(kandang)
         console.log(nama)
         console.log(jenis_kelamin)
         console.log(suhu)
         console.log(detak_jantung)
+        console.log(kesehatan)
         const newSapi = await prisma.sapi.create({
             data: {
                 kandang: kandang,
@@ -60,6 +438,7 @@ app.post('/new/sapi', async (req, res) => {
                 jenis_kelamin,
                 suhu,
                 detak_jantung,
+                kesehatan,
             },
         })
         res.json(newSapi)
@@ -70,16 +449,24 @@ app.post('/new/sapi', async (req, res) => {
 })
 
 app.post('/new/kandang', async (req, res) => {
-    const { gps, kelembapan, kadar_co2 } = req.body
+    const { lokasi, lintang, bujur, kelembapan, co2, metana, kebisingan } = req.body
     try {
-        console.log(gps)
+        console.log(lokasi)
+        console.log(lintang)
+        console.log(bujur)
         console.log(kelembapan)
-        console.log(kadar_co2)
+        console.log(co2)
+        console.log(metana)
+        console.log(kebisingan)
         const newKandang = await prisma.kandang.create({
             data: {
-                gps: gps,
+                lokasi,
+                lintang,
+                bujur,
                 kelembapan,
-                kadar_co2,
+                co2,
+                metana,
+                kebisingan,
             },
         })
         res.json(newKandang)
@@ -89,62 +476,26 @@ app.post('/new/kandang', async (req, res) => {
     }
 })
 
-app.post('/new/gps', async (req, res) => {
-    const { latitude, longitude } = req.body
-    try {
-        console.log(latitude)
-        console.log(longitude)
-        const newGps = await prisma.gps.create({
-            data: {
-                latitude,
-                longitude,
-            },
-        })
-        res.json(newGps)
-    } catch(err) {
-        console.error(err)
-        res.status(500).send()
-    }
-})
-
-app.put('/update/nutrisi/:id', async (req, res) => {
-    const { id } = req.params
-    const { sapi, kondisi } = req.body
-    try {
-        console.log(id)
-        console.log(sapi)
-        console.log(kondisi)
-        const updateNutrisi = await prisma.nutrisi.update({
-            where: { id_nutrisi: Number(id)},
-            data: {
-                sapi: sapi,
-                kondisi,
-            }
-        })
-        res.json(updateNutrisi)
-    } catch(err) {
-        console.error(err)
-        res.status(500).send()
-    }
-})
-
+// Update data
 app.put('/update/sapi/:id', async (req, res) => {
     const { id } = req.params
-    const { kandang, nama, jenis_kelamin, suhu, detak_jantung } = req.body
+    const { kandang, nama, jenis_kelamin, suhu, detak_jantung, kesehatan } = req.body
     try {
         console.log(kandang)
         console.log(nama)
         console.log(jenis_kelamin)
         console.log(suhu)
         console.log(detak_jantung)
+        console.log(kesehatan)
         const updateSapi = await prisma.sapi.update({
             where: { id_sapi: Number(id) },
             data: {
-            kandang: kandang,
-            nama,
-            jenis_kelamin,
-            suhu,
-            detak_jantung
+                kandang: kandang,
+                nama,
+                jenis_kelamin,
+                suhu,
+                detak_jantung,
+                kesehatan,
             }
         })
         res.json(updateSapi)
@@ -156,17 +507,25 @@ app.put('/update/sapi/:id', async (req, res) => {
 
 app.put('/update/kandang/:id', async (req, res) => {
     const { id } = req.params
-    const { gps, kelembapan, kadar_co2 } = req.body
+    const { lokasi, lintang, bujur, kelembapan, co2, metana, kebisingan } = req.body
     try {
-        console.log(gps)
+        console.log(lokasi)
+        console.log(lintang)
+        console.log(bujur)
         console.log(kelembapan)
-        console.log(kadar_co2)
+        console.log(co2)
+        console.log(metana)
+        console.log(kebisingan)
         const updateKandang = await prisma.kandang.update({
             where: { id_kandang: Number(id) },
             data: {
-            gps: gps,
-            kelembapan,
-            kadar_co2,
+                lokasi,
+                lintang,
+                bujur,
+                kelembapan,
+                co2,
+                metana,
+                kebisingan,
             }
         })
         res.json(updateKandang)
@@ -176,36 +535,7 @@ app.put('/update/kandang/:id', async (req, res) => {
     }
 })
 
-app.put('/update/gps/:id', async (req, res) => {
-    const { id } = req.params
-    const { latitude, longitude } = req.body
-    try {
-        console.log(latitude)
-        console.log(longitude)
-        const updateGps = await prisma.gps.update({
-            where: { id_gps: Number(id) },
-            data: {
-            latitude,
-            longitude,
-        }
-        })
-        res.json(updateGps)
-    } catch(err) {
-        console.error(err)
-        res.status(500).send()
-    }
-})
-
-app.delete('/delete/nutrisi/:id', async (req, res) => {
-    const { id } = req.params;
-    const deleteNutrisi = await prisma.nutrisi.delete({
-        where: {
-            id_nutrisi: Number(id),
-        },
-    })
-    res.json(deleteNutrisi)
-})
-
+// Delete data
 app.delete('/delete/sapi/:id', async (req, res) => {
     const { id } = req.params;
     const deleteSapi = await prisma.sapi.delete({
@@ -224,32 +554,6 @@ app.delete('/delete/kandang/:id', async (req, res) => {
         },
     })
     res.json(deleteKandang)
-})
-
-app.delete('/delete/gps/:id', async (req, res) => {
-    const { id } = req.params;
-    const deleteGps = await prisma.gps.delete({
-        where: {
-            id_gps: Number(id),
-        },
-    })
-    res.json(deleteGps)
-})
-
-// Get data sapi
-app.get('/sapi/:id', async (req, res) => {
-    const { id } = req.params
-    try {
-        const sapiUnique = await prisma.sapi.findUnique({
-            where: {
-                id_sapi: Number(id),
-            },
-        })
-        res.json(sapiUnique)
-    } catch(err) {
-        console.error(err)
-        res.status(500).send()
-    }
 })
 
 // Call API

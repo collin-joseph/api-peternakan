@@ -1,6 +1,6 @@
 {
   "name": "api-peternakan",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "route.js",
   "scripts": {
@@ -17,6 +17,8 @@
     "@prisma/client": "^5.1.1",
     "express": "^4.18.2",
     "node": "^20.5.0",
-    "postman-to-openapi": "^3.0.1"
+    "sqlite3": "^5.1.6",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   }
 }
